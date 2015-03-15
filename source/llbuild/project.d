@@ -3,6 +3,8 @@ import llbuild.logger;
 import llbuild.filefinders;
 import llbuild.compilers;
 
+enum projectFileName = "llbuild.sdl";
+
 struct Project
 {
     string[] sourcePaths;
@@ -16,16 +18,81 @@ struct Project
     {
         import std.process: getcwd;
 
-        sourcePaths = [ "source" ];
+        sourcePaths = [];
+        importPaths = [];
         intermediatePath = ".llbuild/int";
         projectRoot = getcwd();
         fileFinder = FileFinder[ "filetree" ];
         emitIR = false;
     }
 
-    void loadSettings()
+    bool loadSettings()
     {
-        // Load from file
+        import sdl = sdlang;
+        import std.algorithm: map;
+        import std.array: array;
+        import std.file: exists;
+        import std.path: buildNormalizedPath;
+
+        auto packagePath = projectRoot.buildNormalizedPath( projectFileName );
+
+        // If no package file, don't parse but building can continue.
+        if( !packagePath.exists )
+            return true;
+
+        sdl.Tag packageSdl;
+        try
+        {
+            packageSdl = sdl.parseFile( packagePath );
+        }
+        catch( sdl.SDLangParseException e )
+        {
+            fatal( e.msg );
+        }
+
+        foreach( tag; packageSdl.tags )
+        {
+            // Add paths
+            switch( tag.name )
+            {
+            case "paths":
+                foreach( pathDef; tag.tags )
+                {
+                    auto vals = pathDef.values.map!( v => v.get!string ).array;
+
+                    switch( pathDef.name )
+                    {
+                    case "source":
+                        sourcePaths ~= vals;
+                        break;
+                    case "import":
+                        importPaths ~= vals;
+                        break;
+                    case "intermediate":
+                        intermediatePath = vals[ 0 ];
+                        break;
+                    default:
+                        fatalf( "Invalid path definition at %s.", pathDef.location.toString() );
+                        return false;
+                    }
+                }
+                break;
+
+            case "filefinder":
+                fileFinder = FileFinder[ tag.values[ 0 ].get!string ];
+                break;
+
+            case "emit-ir":
+                emitIR = tag.values[ 0 ].get!bool;
+                break;
+
+            default:
+                fatalf( "Invalid path definition at %s.", tag.location.toString() );
+                return false;
+            }
+        }
+
+        return true;
     }
 
     bool initialize( ref string[] args )
@@ -53,7 +120,8 @@ struct Project
         }
 
         // Load settings from project file.
-        loadSettings();
+        if( !loadSettings() )
+            return false;
 
         // Override with command options.
         try

@@ -12,6 +12,7 @@ final class ConsoleLogger : Logger
     this( LogLevel lv )
     {
         super( lv );
+        fatalHandler = () {};
     }
 
     override void writeLogMsg( ref LogEntry payload )

@@ -6,7 +6,8 @@
     "authors": [ "Colden Cullen" ],
 
     "dependencies": {
-        "logger": "==0.3.3"
+        "logger": "==0.3.3",
+        "sdlang-d": "==0.8.4"
     },
 
     "versions": [
