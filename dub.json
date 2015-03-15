@@ -1,0 +1,15 @@
+{
+    "name": "llbuild",
+    "description": "An LLVM builder tool.",
+    "copyright": "Copyright © 2015, Colden Cullen",
+    "license": "MIT",
+    "authors": [ "Colden Cullen" ],
+
+    "dependencies": {
+        "logger": "==0.3.3"
+    },
+
+    "versions": [
+        "Use_GitFileFinder"
+    ]
+}
