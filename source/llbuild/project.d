@@ -21,7 +21,14 @@ struct Project
 {
     string[] sourcePaths;
     string[] importPaths;
+
+    // Root of build folders.
+    string buildPath;
+    // Where intermediate files go.
     string intermediatePath;
+    // The name of the linked aggregate file.
+    string aggregateFile;
+
     string projectRoot;
     FileFinder fileFinder;
     bool emitIR;
@@ -40,7 +47,11 @@ struct Project
 
         sourcePaths = [];
         importPaths = [];
-        intermediatePath = ".llbuild/int";
+
+        buildPath = ".llbuild";
+        intermediatePath = "int";
+        aggregateFile = "app";
+
         projectRoot = getcwd();
         fileFinder = FileFinder[ "filetree" ];
         emitIR = false;
@@ -125,7 +136,7 @@ struct Project
         import std.algorithm: uniq;
         import std.array: array;
         import std.getopt;
-        import std.path: buildNormalizedPath;
+        import std.path: buildNormalizedPath, setExtension;
         arraySep = ",";
 
         // Load default settings.
@@ -182,8 +193,15 @@ struct Project
         importPaths = (sourcePaths ~ importPaths).uniq().array();
         sourcePaths = sourcePaths.uniq().array();
 
-        // Make intermediate path absolute.
-        intermediatePath = projectRoot.buildNormalizedPath( intermediatePath );
+        foreach( ref path; sourcePaths )
+            path = projectRoot.buildNormalizedPath( path );
+        foreach( ref path; importPaths )
+            path = projectRoot.buildNormalizedPath( path );
+
+        // Make paths absolute.
+        buildPath = projectRoot.buildNormalizedPath( buildPath );
+        intermediatePath = buildPath.buildNormalizedPath( intermediatePath );
+        aggregateFile = buildPath.buildNormalizedPath( aggregateFile ).setExtension( intermediateExt );
 
         // Initialize the linker.
         linker.initialize( args );
@@ -196,12 +214,15 @@ struct Project
     void clean()
     {
         import std.array: array;
-        import std.file: dirEntries, SpanMode, remove;
+        import std.file: dirEntries, SpanMode, exists, remove;
         import std.path: buildNormalizedPath;
 
-        auto files = intermediatePath.dirEntries( SpanMode.breadth ).array();
+        if( !buildPath.exists )
+            return;
 
-        foreach( file; files )
+        auto files = buildPath.dirEntries( SpanMode.breadth ).array();
+
+        foreach( file; files ) if( file.isFile )
         {
             trace( "Removing file ", file.name );
             file.name.remove();
@@ -230,9 +251,12 @@ struct Project
 
             tracef( "Files for compiler %s: %s", compiler.name, filesForComp );
 
-            compiler.execute( filesForComp, this );
-            if( !compiler.waitForExecution() )
-                return false;
+            if( filesForComp.length > 0 )
+            {
+                compiler.execute( filesForComp, this );
+                if( !compiler.waitForExecution() )
+                    return false;
+            }
         }
 
         return true;
