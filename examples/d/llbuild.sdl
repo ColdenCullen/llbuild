@@ -1,0 +1,6 @@
+paths {
+    source "source"
+}
+
+emit-ir true
+verbosity "trace"
