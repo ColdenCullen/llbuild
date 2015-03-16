@@ -4,7 +4,7 @@ public import std.experimental.logger;
 
 static this()
 {
-    stdlog = new ConsoleLogger( LogLevel.trace );
+    stdlog = new ConsoleLogger( LogLevel.info );
 }
 
 final class ConsoleLogger : Logger

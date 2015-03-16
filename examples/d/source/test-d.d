@@ -1,4 +1,4 @@
-module test;
+module testd;
 
 void main()
 {

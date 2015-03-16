@@ -13,7 +13,12 @@ int main( string[] args )
     if( !project.initialize( args ) )
         return 1;
 
+    project.clean();
+
     if( !project.compile() )
+        return 1;
+
+    if( !project.link() )
         return 1;
 
     return 0;

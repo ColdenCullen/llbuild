@@ -86,6 +86,11 @@ struct Project
                 emitIR = tag.values[ 0 ].get!bool;
                 break;
 
+            case "verbosity":
+                import std.conv: to;
+                stdlog.logLevel = tag.values[ 0 ].get!string.to!LogLevel;
+                break;
+
             default:
                 fatalf( "Invalid path definition at %s.", tag.location.toString() );
                 return false;
@@ -170,11 +175,34 @@ struct Project
         return opt;
     }
 
+    void clean()
+    {
+        import std.array: array;
+        import std.file: dirEntries, SpanMode, remove;
+        import std.path: buildNormalizedPath;
+
+        auto files = projectRoot.buildNormalizedPath( intermediatePath )
+                                .dirEntries( SpanMode.breadth )
+                                .array();
+
+        foreach( file; files )
+        {
+            trace( "Removing file ", file.name );
+            file.name.remove();
+        }
+    }
+
     bool compile()
     {
         import std.algorithm: canFind, filter, group, map;
-        import std.array: array, join;
-        import std.path: extension;
+        import std.array: array, join, replace;
+        import std.path: extension, relativePath, buildNormalizedPath;
+
+        string getIntermediatePath( const string path ) pure
+        {
+            auto relPath = relativePath( path, projectRoot ).replace( "..", "." ).buildNormalizedPath();
+            return intermediatePath.buildNormalizedPath( relPath );
+        }
 
         info( "Compiling..." );
 
@@ -183,8 +211,10 @@ struct Project
 
         foreach( compiler; Compiler.getCompilers() )
         {
-            auto filesForComp = files.filter!( f => compiler.extensions.canFind( f.extension ) ).array;
+            auto filesForComp = files.filter!( f => compiler.extensions.canFind( f.extension ) ).array();
+
             tracef( "Files for compiler %s: %s", compiler.name, filesForComp );
+
             compiler.execute( filesForComp, options );
             if( !compiler.waitForExecution() )
                 return false;
@@ -193,12 +223,8 @@ struct Project
         return true;
     }
 
-    string getIntermediatePath( const string path ) const pure
+    bool link()
     {
-        import std.array: replace;
-        import std.path: relativePath, buildNormalizedPath;
-
-        auto relPath = relativePath( path, projectRoot ).replace( "..", "." ).buildNormalizedPath();
-        return intermediatePath.buildNormalizedPath( relPath );
+        return true;
     }
 }

@@ -2,7 +2,6 @@ module llbuild.compilers.clang;
 import llbuild.plugin;
 import llbuild.compilers.compiler;
 
-/*
 final class Clang : Compiler, Extension!( Clang, Compiler )
 {
     this()
@@ -10,17 +9,21 @@ final class Clang : Compiler, Extension!( Clang, Compiler )
         super( "clang", [ "cpp", "cxx" ], "clang" );
     }
 
-    override string[] createArgs( const string path, const string outDir, const CompilationOptions options )
+    override string[] createArgs( const CompilationOptions options )
     {
         import std.conv: to;
 
-        return [
-            "clang",
+        typeof(return) args = [
+            "-cc1",
+            options.emitIR ? "-S" : "",
             options.emitIR ? "-emit-llvm" : "-emit-llvm-bc",
-            "-o", outDir,
-            "-"~options.optimizationLevel.to!string,
-            path
+            "-o", options.intDir~"/cpp."~options.intExtension,
+            "-"~options.optimizationLevel.to!string
         ];
+
+        foreach( imp; options.importPaths )
+            args ~= ("-I=" ~ imp);
+
+        return args;
     }
 }
-*/

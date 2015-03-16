@@ -1,4 +1,5 @@
 module llbuild.compilers.compiler;
+import llbuild.logger;
 import llbuild.plugin;
 import std.process;
 
@@ -34,17 +35,6 @@ public:
     mixin( extendable!Compiler );
 
     /**
-     * Get all supported file extensions.
-     */
-    static immutable(string[]) getExtensions()
-    {
-        import std.algorithm: map;
-        import std.array: join;
-
-        return getCompilers().map!( c => c.extensions ).join();
-    }
-
-    /**
      * Finds a compiler based on the given extension.
      */
     static Compiler getByExtension( string ext )
@@ -73,6 +63,7 @@ public:
     void execute( string[] files, const CompilationOptions opts )
     {
         auto args = createArgs( opts );
+        trace( "Executing: ", executable ~ args ~ files );
         processId = spawnProcess( executable ~ args ~ files );
     }
 
