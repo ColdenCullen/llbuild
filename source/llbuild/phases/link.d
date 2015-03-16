@@ -1,5 +1,5 @@
 module llbuild.phases.link;
-import llbuild.plugin, llbuild.project;
+import llbuild.plugin, llbuild.project, llbuild.logger;
 import llbuild.phases.phase;
 import llbuild.filefinders;
 import std.process;
@@ -22,6 +22,8 @@ public:
         auto finder = FileFinder[ "filetree" ];
         auto files = finder.findFiles( project.intermediatePath );
 
+        trace( "intermediate path: ", project.intermediatePath );
+        trace( "Executing: ", [ "llvm-link" ] ~ createArgs( project ) ~ files );
         processId = spawnProcess( [ "llvm-link" ] ~ createArgs( project ) ~ files );
     }
 

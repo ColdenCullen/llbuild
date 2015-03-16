@@ -17,7 +17,7 @@ enum OptimizationLevel
     Oz,
 }
 
-struct Project
+class Project
 {
     string[] sourcePaths;
     string[] importPaths;
@@ -207,64 +207,6 @@ struct Project
             phase.initialize( this, args );
 
         trace( "Settings: \nsourcePaths: ", sourcePaths, "\nimportPaths: ", importPaths, "\nint: ", intermediatePath, "\nff: ", fileFinder.name );
-
-        return true;
-    }
-
-    void clean()
-    {
-        import std.array: array;
-        import std.file: dirEntries, SpanMode, exists, remove;
-        import std.path: buildNormalizedPath;
-
-        if( !buildPath.exists )
-            return;
-
-        auto files = buildPath.dirEntries( SpanMode.breadth ).array();
-
-        foreach( file; files ) if( file.isFile )
-        {
-            trace( "Removing file ", file.name );
-            file.name.remove();
-        }
-    }
-
-    bool compile()
-    {
-        import std.algorithm: canFind, filter, group, map;
-        import std.array: array, join, replace;
-        import std.path: extension, relativePath, buildNormalizedPath;
-
-        string getIntermediatePath( const string path ) pure
-        {
-            auto relPath = relativePath( path, projectRoot ).replace( "..", "." ).buildNormalizedPath();
-            return intermediatePath.buildNormalizedPath( relPath );
-        }
-
-        info( "Compiling..." );
-
-        auto files = sourcePaths.map!( p => fileFinder.findFiles( p ) ).join();
-
-        foreach( compiler; Compiler.getCompilers() )
-        {
-            auto filesForComp = files.filter!( f => compiler.extensions.canFind( f.extension ) ).array();
-
-            tracef( "Files for compiler %s: %s", compiler.name, filesForComp );
-
-            if( filesForComp.length > 0 )
-            {
-                compiler.execute( filesForComp, this );
-                if( !compiler.waitForExecution() )
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    bool link()
-    {
-        Phase[ "link" ].execute();
 
         return true;
     }
