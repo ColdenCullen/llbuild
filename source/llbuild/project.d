@@ -1,9 +1,21 @@
 module llbuild.project;
 import llbuild.logger;
+import llbuild.linker;
 import llbuild.filefinders;
 import llbuild.compilers;
 
 enum projectFileName = "llbuild.sdl";
+
+/// LLVM optimization levels
+enum OptimizationLevel
+{
+    O0,
+    O1,
+    O2,
+    O3,
+    Os,
+    Oz,
+}
 
 struct Project
 {
@@ -13,6 +25,14 @@ struct Project
     string projectRoot;
     FileFinder fileFinder;
     bool emitIR;
+    OptimizationLevel linkOptimizationLevel;
+    OptimizationLevel compileOptimizationLevel;
+    Linker linker;
+
+    string intermediateExt() const
+    {
+        return emitIR ? "ll" : "bc";
+    }
 
     void loadDefaultSettings()
     {
@@ -105,6 +125,7 @@ struct Project
         import std.algorithm: uniq;
         import std.array: array;
         import std.getopt;
+        import std.path: buildNormalizedPath;
         arraySep = ",";
 
         // Load default settings.
@@ -161,18 +182,15 @@ struct Project
         importPaths = (sourcePaths ~ importPaths).uniq().array();
         sourcePaths = sourcePaths.uniq().array();
 
+        // Make intermediate path absolute.
+        intermediatePath = projectRoot.buildNormalizedPath( intermediatePath );
+
+        // Initialize the linker.
+        linker.initialize( args );
+
         trace( "Settings: \nsourcePaths: ", sourcePaths, "\nimportPaths: ", importPaths, "\nint: ", intermediatePath, "\nff: ", fileFinder.name );
 
         return true;
-    }
-
-    CompilationOptions getCompilationOptions()
-    {
-        CompilationOptions opt;
-        opt.emitIR = emitIR;
-        opt.importPaths = importPaths;
-        opt.intDir = intermediatePath;
-        return opt;
     }
 
     void clean()
@@ -181,9 +199,7 @@ struct Project
         import std.file: dirEntries, SpanMode, remove;
         import std.path: buildNormalizedPath;
 
-        auto files = projectRoot.buildNormalizedPath( intermediatePath )
-                                .dirEntries( SpanMode.breadth )
-                                .array();
+        auto files = intermediatePath.dirEntries( SpanMode.breadth ).array();
 
         foreach( file; files )
         {
@@ -207,7 +223,6 @@ struct Project
         info( "Compiling..." );
 
         auto files = sourcePaths.map!( p => fileFinder.findFiles( p ) ).join();
-        CompilationOptions options = getCompilationOptions();
 
         foreach( compiler; Compiler.getCompilers() )
         {
@@ -215,7 +230,7 @@ struct Project
 
             tracef( "Files for compiler %s: %s", compiler.name, filesForComp );
 
-            compiler.execute( filesForComp, options );
+            compiler.execute( filesForComp, this );
             if( !compiler.waitForExecution() )
                 return false;
         }
@@ -225,6 +240,8 @@ struct Project
 
     bool link()
     {
+        linker.execute( this );
+
         return true;
     }
 }

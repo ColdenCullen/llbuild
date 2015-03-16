@@ -1,30 +1,8 @@
 module llbuild.compilers.compiler;
 import llbuild.logger;
 import llbuild.plugin;
+import llbuild.project;
 import std.process;
-
-enum OptimizationLevel
-{
-    O0,
-    O1,
-    O2,
-    O3,
-    Os,
-    Oz,
-}
-
-struct CompilationOptions
-{
-    bool emitIR = false;
-    string[] importPaths;
-    string intDir;
-    OptimizationLevel optimizationLevel = OptimizationLevel.O0;
-
-    string intExtension() const
-    {
-        return emitIR ? "ll" : "bc";
-    }
-}
 
 /**
  * Class responsible for defining a compiler.
@@ -60,19 +38,17 @@ public:
         executable = executable_;
     }
 
-    void execute( string[] files, const CompilationOptions opts )
+    void execute( string[] files, Project project )
     {
-        auto args = createArgs( opts );
+        auto args = createArgs( project );
         trace( "Executing: ", executable ~ args ~ files );
         processId = spawnProcess( executable ~ args ~ files );
     }
 
     bool waitForExecution()
     {
-        auto result = processId.wait();
-
-        return result == 0;
+        return processId.wait() == 0;
     }
 
-    abstract string[] createArgs( const CompilationOptions options );
+    abstract string[] createArgs( Project project );
 }
