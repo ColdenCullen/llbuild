@@ -1,29 +1,28 @@
-module llbuild.linker;
-import llbuild.project;
+module llbuild.phases.link;
+import llbuild.plugin, llbuild.project;
+import llbuild.phases.phase;
 import llbuild.filefinders;
 import std.process;
 
-struct Linker
+class Link : Phase, Extension!( Link, Phase )
 {
 public:
-    Pid processId;
-
-    bool initialize( ref string[] args )
+    this()
     {
-        return true;
+        super( "link" );
     }
 
-    void execute( Project project )
+    override void initialize( Project project, ref string[] args )
+    {
+        super.initialize( project, args );
+    }
+
+    override void execute()
     {
         auto finder = FileFinder[ "filetree" ];
         auto files = finder.findFiles( project.intermediatePath );
 
         processId = spawnProcess( [ "llvm-link" ] ~ createArgs( project ) ~ files );
-    }
-
-    bool waitForExecution()
-    {
-        return processId.wait() == 0;
     }
 
 private:

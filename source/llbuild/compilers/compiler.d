@@ -26,7 +26,6 @@ public:
     immutable(string) name;
     immutable(string[]) extensions;
     immutable(string) executable;
-    Pid processId;
 
     this( immutable(string) name_, immutable(string[]) extensions_, immutable(string) executable_ )
     {
@@ -50,5 +49,9 @@ public:
         return processId.wait() == 0;
     }
 
+protected:
     abstract string[] createArgs( Project project );
+
+private:
+    Pid processId;
 }

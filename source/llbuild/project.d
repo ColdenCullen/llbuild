@@ -1,6 +1,6 @@
 module llbuild.project;
 import llbuild.logger;
-import llbuild.linker;
+import llbuild.phases;
 import llbuild.filefinders;
 import llbuild.compilers;
 
@@ -34,7 +34,6 @@ struct Project
     bool emitIR;
     OptimizationLevel linkOptimizationLevel;
     OptimizationLevel compileOptimizationLevel;
-    Linker linker;
 
     string intermediateExt() const
     {
@@ -204,7 +203,8 @@ struct Project
         aggregateFile = buildPath.buildNormalizedPath( aggregateFile ).setExtension( intermediateExt );
 
         // Initialize the linker.
-        linker.initialize( args );
+        foreach( phase; Phase.getPhases() )
+            phase.initialize( this, args );
 
         trace( "Settings: \nsourcePaths: ", sourcePaths, "\nimportPaths: ", importPaths, "\nint: ", intermediatePath, "\nff: ", fileFinder.name );
 
@@ -264,7 +264,7 @@ struct Project
 
     bool link()
     {
-        linker.execute( this );
+        Phase[ "link" ].execute();
 
         return true;
     }
