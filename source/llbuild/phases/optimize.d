@@ -8,14 +8,12 @@ final class Optimize : Phase, Extension!( Optimize, Phase )
 public:
     this()
     {
-        super( "optimize" );
+        super( "optimize", "Optimizing" );
     }
 
     override void execute()
     {
         import std.process: spawnProcess;
-
-        info( "Optimizing..." );
 
         trace( "Executing: ", [ "opt" ] ~ createArgs( project ) ~ project.aggregateFile );
         processId = spawnProcess( [ "opt" ] ~ createArgs( project ) ~ project.aggregateFile );

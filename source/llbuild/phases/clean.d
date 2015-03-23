@@ -6,7 +6,7 @@ class Clean : Phase, Extension!( Clean, Phase )
 {
     this()
     {
-        super( "clean" );
+        super( "clean", "Cleaning" );
     }
 
     override void execute()
@@ -14,8 +14,6 @@ class Clean : Phase, Extension!( Clean, Phase )
         import std.array: array;
         import std.file: dirEntries, SpanMode, exists, remove;
         import std.path: buildNormalizedPath;
-
-        info( "Cleaning..." );
 
         if( !project.buildPath.exists )
             return;

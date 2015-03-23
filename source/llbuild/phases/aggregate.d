@@ -8,14 +8,12 @@ class Aggregate : Phase, Extension!( Aggregate, Phase )
 public:
     this()
     {
-        super( "aggregate" );
+        super( "aggregate", "Aggregating" );
     }
 
     override void execute()
     {
         import std.process;
-
-        info( "Aggregating..." );
 
         auto finder = FileFinder[ "filetree" ];
         auto files = finder.findFiles( project.intermediatePath );

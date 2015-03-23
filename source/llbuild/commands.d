@@ -1,6 +1,7 @@
 module llbuild.commands;
 import llbuild.plugin, llbuild.project;
 import llbuild.phases;
+import llbuild.logger;
 
 abstract class Command
 {
@@ -28,6 +29,7 @@ public:
 
         foreach( phase; getPhases() )
         {
+            info( phase.verb, "..." );
             phase.execute();
             if( phase.processId )
                 if( !phase.processId.wait() )

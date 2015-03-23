@@ -8,12 +8,14 @@ public:
     mixin( extendable!Phase );
 
     immutable(string) name;
+    immutable(string) verb;
     Project project;
     Pid processId;
 
-    this( immutable(string) name_ )
+    this( immutable(string) name_, immutable(string) verb_ )
     {
         name = name_;
+        verb = verb_;
     }
 
     void initialize( Project project_ )

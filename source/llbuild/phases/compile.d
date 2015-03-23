@@ -7,7 +7,7 @@ final class Compile : Phase, Extension!( Compile, Phase )
 {
     this()
     {
-        super( "compile" );
+        super( "compile", "Compiling" );
     }
 
     override void execute()
@@ -16,8 +16,6 @@ final class Compile : Phase, Extension!( Compile, Phase )
         import std.array: array, join, replace;
         import std.file: exists, mkdirRecurse;
         import std.path: extension, relativePath, buildNormalizedPath;
-
-        info( "Compiling..." );
 
         string getIntermediatePath( const string path ) pure
         {
