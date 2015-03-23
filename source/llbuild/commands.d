@@ -1,4 +1,4 @@
-module llbuild.commands.command;
+module llbuild.commands;
 import llbuild.plugin, llbuild.project;
 import llbuild.phases;
 
@@ -26,5 +26,26 @@ public:
     {
         foreach( phase; getPhases() )
             phase.execute();
+    }
+}
+
+final class Build : Command, Extension!( Build, Command )
+{
+    this()
+    {
+        super( "build" );
+    }
+
+    override Phase[] getPhases()
+    {
+        import std.algorithm: map;
+        import std.array: array;
+
+        return [
+            "clean",
+            "compile",
+            "link",
+            "optimize",
+        ].map!( n => Phase[ n ] ).array();
     }
 }
