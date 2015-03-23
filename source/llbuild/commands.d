@@ -32,8 +32,14 @@ public:
             info( phase.verb, "..." );
             phase.execute();
             if( phase.processId )
-                if( !phase.processId.wait() )
+            {
+                auto status = phase.processId.wait();
+                if( status != 0 )
+                {
+                    fatalf( "%s has failed with code %d.", phase.verb, status );
                     return false;
+                }
+            }
         }
 
         return true;
