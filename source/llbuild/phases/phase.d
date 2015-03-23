@@ -1,8 +1,8 @@
 module llbuild.phases.phase;
-import llbuild.plugin, llbuild.project;
+import llbuild.plugin, llbuild.project, llbuild.arghandler;
 import std.process;
 
-abstract class Phase
+abstract class Phase : ArgHandler
 {
 public:
     mixin( extendable!Phase );
@@ -16,7 +16,7 @@ public:
         name = name_;
     }
 
-    void initialize( Project project_, ref string[] args )
+    void initialize( Project project_ )
     {
         project = project_;
     }

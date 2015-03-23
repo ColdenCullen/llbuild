@@ -1,13 +1,11 @@
 module llbuild.compilers.compiler;
-import llbuild.logger;
-import llbuild.plugin;
-import llbuild.project;
+import llbuild.logger, llbuild.plugin, llbuild.project, llbuild.arghandler;
 import std.process;
 
 /**
  * Class responsible for defining a compiler.
  */
-abstract class Compiler
+abstract class Compiler : ArgHandler
 {
 public:
     mixin( extendable!Compiler );

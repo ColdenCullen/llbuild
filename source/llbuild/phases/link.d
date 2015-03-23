@@ -12,11 +12,6 @@ public:
         super( "link" );
     }
 
-    override void initialize( Project project, ref string[] args )
-    {
-        super.initialize( project, args );
-    }
-
     override void execute()
     {
         auto finder = FileFinder[ "filetree" ];

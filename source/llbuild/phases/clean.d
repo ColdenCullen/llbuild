@@ -9,11 +9,6 @@ class Clean : Phase, Extension!( Clean, Phase )
         super( "clean" );
     }
 
-    override void initialize( Project project, ref string[] args )
-    {
-        super.initialize( project, args );
-    }
-
     override void execute()
     {
         import std.array: array;

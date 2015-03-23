@@ -16,10 +16,10 @@ public:
 
     abstract Phase[] getPhases();
 
-    final void initialize( Project project, ref string[] args )
+    final void initialize( Project project )
     {
         foreach( phase; getPhases() )
-            phase.initialize( project, args );
+            phase.initialize( project );
     }
 
     final void execute()

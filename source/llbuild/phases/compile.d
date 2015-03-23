@@ -10,11 +10,6 @@ final class Compile : Phase, Extension!( Compile, Phase )
         super( "compile" );
     }
 
-    override void initialize( Project project, ref string[] args )
-    {
-        super.initialize( project, args );
-    }
-
     override void execute()
     {
         import std.algorithm: canFind, filter, group, map;

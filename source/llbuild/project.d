@@ -3,6 +3,7 @@ import llbuild.logger;
 import llbuild.phases;
 import llbuild.filefinders;
 import llbuild.compilers;
+import llbuild.arghandler;
 
 enum projectFileName = "llbuild.sdl";
 
@@ -17,7 +18,7 @@ enum OptimizationLevel
     Oz,
 }
 
-class Project
+class Project : ArgHandler
 {
     string[] sourcePaths;
     string[] importPaths;
@@ -34,6 +35,21 @@ class Project
     bool emitIR;
     OptimizationLevel linkOptimizationLevel;
     OptimizationLevel compileOptimizationLevel;
+
+    this()
+    {
+        import std.typecons: No;
+
+        registerArgs(
+            No.autoProcess,
+            arg( "sourcePath|S", ( string opt, string val ) { sourcePaths ~= val; }, "Add source paths to search for code" ),
+            arg( "importPath|I", ( string opt, string val ) { importPaths ~= val; }, "Add import paths to search for code and headers" ),
+            arg( "intermediatePath|o", &intermediatePath, "Set intermediate artifact directory" ),
+            arg( "filefinder", ( string opt, string val ) { fileFinder = FileFinder[ val ]; }, "Specifiy a file finder to use." ),
+            arg( "emit-ir|r", &emitIR, "Emit LLVM IR instead of bitcode" ),
+            arg( "verbose|v", { stdlog.logLevel = LogLevel.all; }, "Output more runtime information" )
+        );
+    }
 
     string intermediateExt() const
     {
@@ -134,59 +150,17 @@ class Project
     {
         import std.algorithm: uniq;
         import std.array: array;
-        import std.getopt;
         import std.path: buildNormalizedPath, setExtension;
-        arraySep = ",";
 
         // Load default settings.
         loadDefaultSettings();
-
-        // Load project root path.
-        try
-        {
-            args.getopt(
-                config.passThrough,
-                "project|p", &projectRoot
-            );
-        }
-        catch( GetOptException e )
-        {
-            fatal( e.msg );
-            return false;
-        }
 
         // Load settings from project file.
         if( !loadSettings() )
             return false;
 
         // Override with command options.
-        try
-        {
-            string fileFinderName = null;
-            string[] extraSourcePaths;
-            string[] extraImportPaths;
-            args.getopt(
-                config.passThrough,
-                "sourcePath|S", &extraSourcePaths,
-                "importPath|I", &extraImportPaths,
-                "intermediatePath|o", &intermediatePath,
-                "filefinder", &fileFinderName,
-                "emit-ir|r", &emitIR,
-                "verbose|v", () => stdlog.logLevel = LogLevel.all
-            );
-
-            sourcePaths ~= extraSourcePaths;
-            importPaths ~= extraImportPaths;
-
-            // If file finder name specified, use that one.
-            if( fileFinderName )
-                fileFinder = FileFinder[ fileFinderName ];
-        }
-        catch( GetOptException e )
-        {
-            fatal( e.msg );
-            return false;
-        }
+        processArgs();
 
         // Add source paths to import paths
         importPaths = (sourcePaths ~ importPaths).uniq().array();
@@ -201,10 +175,6 @@ class Project
         buildPath = projectRoot.buildNormalizedPath( buildPath );
         intermediatePath = buildPath.buildNormalizedPath( intermediatePath );
         aggregateFile = buildPath.buildNormalizedPath( aggregateFile ).setExtension( intermediateExt );
-
-        // Initialize the linker.
-        foreach( phase; Phase.getPhases() )
-            phase.initialize( this, args );
 
         trace( "Settings: \nsourcePaths: ", sourcePaths, "\nimportPaths: ", importPaths, "\nint: ", intermediatePath, "\nff: ", fileFinder.name );
 
