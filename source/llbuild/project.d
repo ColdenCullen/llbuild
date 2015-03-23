@@ -32,6 +32,8 @@ class Project : ArgHandler
     string aggregateFile;
     /// The name of the linked optimized aggregate file
     string aggregateOptFile;
+    /// The name of the output file
+    string outFile;
     /// The root folder of the current project
     string projectRoot;
     /// The file finder to use when finding source files
@@ -51,7 +53,8 @@ class Project : ArgHandler
             No.autoProcess,
             arg( "sourcePath|S", ( string opt, string val ) { sourcePaths ~= val; }, "Add source paths to search for code" ),
             arg( "importPath|I", ( string opt, string val ) { importPaths ~= val; }, "Add import paths to search for code and headers" ),
-            arg( "intermediatePath|o", &intermediatePath, "Set intermediate artifact directory" ),
+            arg( "intermediatePath", &intermediatePath, "The intermediate artifact directory" ),
+            arg( "outfile|o", &outFile, "The name of the final compiled file" ),
             arg( "filefinder", ( string opt, string val ) { fileFinder = FileFinder[ val ]; }, "Specifiy a file finder to use." ),
             arg( "emit-ir|r", &emitIR, "Emit LLVM IR instead of bitcode" ),
             arg( "opt", &finalOptimizationLevel, "LLVM level to optimize to after aggrecation" ),
@@ -76,6 +79,7 @@ class Project : ArgHandler
         intermediatePath = "int";
         aggregateFile = "app";
         aggregateOptFile = "app-opt";
+        outFile = "app";
 
         finalOptimizationLevel = OptimizationLevel.O3;
         compileOptimizationLevel = OptimizationLevel.O0;
@@ -148,6 +152,14 @@ class Project : ArgHandler
 
             case "verbosity":
                 stdlog.logLevel = tag.values[ 0 ].get!string.to!LogLevel;
+                break;
+
+            case "intermediatePath":
+                intermediatePath = tag.values[ 0 ].get!string;
+                break;
+
+            case "outFile":
+                outFile = tag.values[ 0 ].get!string;
                 break;
 
             case "opt":

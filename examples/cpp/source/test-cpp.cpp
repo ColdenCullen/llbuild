@@ -1,6 +1,4 @@
-#include <iostream>
-
-using namespace std;
+#include <stdio.h>
 
 void noop();
 void fakeNoop();
@@ -9,6 +7,9 @@ int main()
 {
     noop();
     fakeNoop();
+
+    printf( "Dayum!\n" );
+
     return 0;
 }
 

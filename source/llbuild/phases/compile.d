@@ -2,6 +2,7 @@ module llbuild.phases.compile;
 import llbuild.plugin, llbuild.project, llbuild.logger;
 import llbuild.phases.phase;
 import llbuild.compilers;
+import llbuild.languages;
 
 final class Compile : Phase, Extension!( Compile, Phase )
 {
@@ -29,18 +30,18 @@ final class Compile : Phase, Extension!( Compile, Phase )
 
         auto files = project.sourcePaths.map!( p => project.fileFinder.findFiles( p ) ).join();
 
-        foreach( compiler; Compiler.getCompilers() )
+        foreach( language; Language.getLanguages() )
         {
-            auto filesForComp = files.filter!( f => compiler.extensions.canFind( f.extension ) ).array();
-
-            tracef( "Files for compiler %s: %s", compiler.name, filesForComp );
+            auto filesForComp = files.filter!( f => language.extensions.canFind( f.extension ) ).array();
 
             if( filesForComp.length > 0 )
             {
-                compiler.execute( filesForComp, project );
-                if( !compiler.waitForExecution() )
-                    return ;// false;
+                Language.activeLanguages ~= language;
+                language.compiler.execute( filesForComp, project );
             }
         }
+
+        foreach( lang; Language.activeLanguages )
+            lang.compiler.waitForExecution();
     }
 }

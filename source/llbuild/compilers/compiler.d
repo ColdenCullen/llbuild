@@ -10,19 +10,7 @@ abstract class Compiler : ArgHandler
 public:
     mixin( extendable!Compiler );
 
-    /**
-     * Finds a compiler based on the given extension.
-     */
-    static Compiler getByExtension( string ext )
-    {
-        import std.algorithm: canFind, filter;
-
-        auto compilers = getCompilers().filter!( c => c.extensions.canFind( ext ) );
-        return compilers.empty ? null : compilers.front;
-    }
-
     immutable(string) name;
-    immutable(string[]) extensions;
     immutable(string) executable;
 
     this( immutable(string) name_, immutable(string[]) extensions_, immutable(string) executable_ )
@@ -31,7 +19,6 @@ public:
         import std.array: array;
 
         name = name_;
-        extensions = extensions_.map!( e => "." ~ e ).array;
         executable = executable_;
     }
 

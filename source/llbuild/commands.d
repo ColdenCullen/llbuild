@@ -63,6 +63,7 @@ final class Build : Command, Extension!( Build, Command )
             "compile",
             "aggregate",
             "optimize",
+            "link",
         ].map!( n => Phase[ n ] ).array();
     }
 }

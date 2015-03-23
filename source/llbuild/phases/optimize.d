@@ -15,12 +15,12 @@ public:
     {
         import std.process: spawnProcess;
 
-        trace( "Executing: ", [ "opt" ] ~ createArgs( project ) ~ project.aggregateFile );
-        processId = spawnProcess( [ "opt" ] ~ createArgs( project ) ~ project.aggregateFile );
+        trace( "Executing: ", "opt" ~ createArgs() ~ project.aggregateFile );
+        processId = spawnProcess( "opt" ~ createArgs() ~ project.aggregateFile );
     }
 
 private:
-    string[] createArgs( Project project )
+    string[] createArgs()
     {
         import std.conv: to;
 
