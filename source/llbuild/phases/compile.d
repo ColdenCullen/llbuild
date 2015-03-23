@@ -17,6 +17,8 @@ final class Compile : Phase, Extension!( Compile, Phase )
         import std.file: exists, mkdirRecurse;
         import std.path: extension, relativePath, buildNormalizedPath;
 
+        info( "Compiling..." );
+
         string getIntermediatePath( const string path ) pure
         {
             auto relPath = relativePath( path, project.projectRoot ).replace( "..", "." ).buildNormalizedPath();

@@ -1,23 +1,25 @@
-module llbuild.phases.link;
+module llbuild.phases.aggregate;
 import llbuild.plugin, llbuild.project, llbuild.logger;
 import llbuild.phases.phase;
 import llbuild.filefinders;
-import std.process;
 
-class Link : Phase, Extension!( Link, Phase )
+class Aggregate : Phase, Extension!( Aggregate, Phase )
 {
 public:
     this()
     {
-        super( "link" );
+        super( "aggregate" );
     }
 
     override void execute()
     {
+        import std.process;
+
+        info( "Aggregating..." );
+
         auto finder = FileFinder[ "filetree" ];
         auto files = finder.findFiles( project.intermediatePath );
 
-        trace( "intermediate path: ", project.intermediatePath );
         trace( "Executing: ", [ "llvm-link" ] ~ createArgs( project ) ~ files );
         processId = spawnProcess( [ "llvm-link" ] ~ createArgs( project ) ~ files );
     }

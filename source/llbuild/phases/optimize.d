@@ -15,6 +15,8 @@ public:
     {
         import std.process: spawnProcess;
 
+        info( "Optimizing..." );
+
         trace( "Executing: ", [ "opt" ] ~ createArgs( project ) ~ project.aggregateFile );
         processId = spawnProcess( [ "opt" ] ~ createArgs( project ) ~ project.aggregateFile );
     }

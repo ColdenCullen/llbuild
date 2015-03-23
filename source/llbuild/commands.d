@@ -22,7 +22,7 @@ public:
             phase.initialize( project );
     }
 
-    final void execute()
+    final bool execute()
     {
         import std.process: wait;
 
@@ -30,8 +30,11 @@ public:
         {
             phase.execute();
             if( phase.processId )
-                phase.processId.wait();
+                if( !phase.processId.wait() )
+                    return false;
         }
+
+        return true;
     }
 }
 
@@ -50,7 +53,7 @@ final class Build : Command, Extension!( Build, Command )
         return [
             "clean",
             "compile",
-            "link",
+            "aggregate",
             "optimize",
         ].map!( n => Phase[ n ] ).array();
     }

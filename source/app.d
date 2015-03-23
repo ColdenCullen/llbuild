@@ -21,7 +21,8 @@ int main( string[] args )
 
     command.initialize( project );
 
-    command.execute();
+    if( !command.execute() )
+        return 1;
 
     return 0;
 }
