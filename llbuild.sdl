@@ -1,6 +1,6 @@
 paths {
     source "source"
-    import "/Users/Colden/.dub/packages/sdlang-d-0.8.4/src/"
+    import "/Users/Colden/.dub/packages/sdlang-d-0.9.1/src/"
     import "/Users/Colden/.dub/packages/logger-0.3.3/"
 }
 

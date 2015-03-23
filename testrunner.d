@@ -9,7 +9,7 @@ import std.stdio;
 int main()
 {
     writeln( "Building..." );
-    auto dub = execute( [ "dub", "build" ] );
+    auto dub = execute( [ "dub", "build", "--compiler="~environment.get( "DC", "dmd" ) ] );
     if( dub.status != 0 )
     {
         writeln( "Build failed.\n", dub.output );

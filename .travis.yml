@@ -1,0 +1,12 @@
+language: d
+d:
+- ldc-0.15.1
+
+before_install:
+- sudo apt-get update
+install:
+- sudo apt-get install clang-3.5
+
+script:
+- ldc2 testrunner.d -of=testrunner
+- ./testrunner
