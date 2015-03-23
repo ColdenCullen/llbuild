@@ -67,3 +67,26 @@ final class Build : Command, Extension!( Build, Command )
         ].map!( n => Phase[ n ] ).array();
     }
 }
+
+final class Run : Command, Extension!( Run, Command )
+{
+    this()
+    {
+        super( "run" );
+    }
+
+    override Phase[] getPhases()
+    {
+        import std.algorithm: map;
+        import std.array: array;
+
+        return [
+            "clean",
+            "compile",
+            "aggregate",
+            "optimize",
+            "link",
+            "execute",
+        ].map!( n => Phase[ n ] ).array();
+    }
+}

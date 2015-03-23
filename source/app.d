@@ -14,7 +14,7 @@ int main( string[] args )
     if( args.length > 1 && Command[ args[ 1 ] ] )
         command = Command[ args[ 1 ] ];
     else
-        command = Command[ "build" ];
+        command = Command[ "run" ];
 
     if( !project.initialize( args ) )
         return 1;

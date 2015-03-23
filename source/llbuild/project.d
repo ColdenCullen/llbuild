@@ -32,6 +32,8 @@ class Project : ArgHandler
     string aggregateFile;
     /// The name of the linked optimized aggregate file
     string aggregateOptFile;
+    /// The path to the output file
+    string outPath;
     /// The name of the output file
     string outFile;
     /// The root folder of the current project
@@ -54,6 +56,7 @@ class Project : ArgHandler
             arg( "sourcePath|S", ( string opt, string val ) { sourcePaths ~= val; }, "Add source paths to search for code" ),
             arg( "importPath|I", ( string opt, string val ) { importPaths ~= val; }, "Add import paths to search for code and headers" ),
             arg( "intermediatePath", &intermediatePath, "The intermediate artifact directory" ),
+            arg( "outpath", &outPath, "The output path of the compiled file" ),
             arg( "outfile|o", &outFile, "The name of the final compiled file" ),
             arg( "filefinder", ( string opt, string val ) { fileFinder = FileFinder[ val ]; }, "Specifiy a file finder to use." ),
             arg( "emit-ir|r", &emitIR, "Emit LLVM IR instead of bitcode" ),
@@ -79,6 +82,7 @@ class Project : ArgHandler
         intermediatePath = "int";
         aggregateFile = "app";
         aggregateOptFile = "app-opt";
+        outPath = ".";
         outFile = "app";
 
         finalOptimizationLevel = OptimizationLevel.O3;
@@ -156,6 +160,10 @@ class Project : ArgHandler
 
             case "intermediatePath":
                 intermediatePath = tag.values[ 0 ].get!string;
+                break;
+
+            case "outPath":
+                outPath = tag.values[ 0 ].get!string;
                 break;
 
             case "outFile":
