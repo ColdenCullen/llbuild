@@ -24,8 +24,14 @@ public:
 
     final void execute()
     {
+        import std.process: wait;
+
         foreach( phase; getPhases() )
+        {
             phase.execute();
+            if( phase.processId )
+                phase.processId.wait();
+        }
     }
 }
 

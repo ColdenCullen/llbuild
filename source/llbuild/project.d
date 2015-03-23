@@ -20,20 +20,27 @@ enum OptimizationLevel
 
 class Project : ArgHandler
 {
+    /// Paths to look for source files in
     string[] sourcePaths;
+    /// Paths to look for imported/included files in
     string[] importPaths;
-
-    // Root of build folders.
+    /// Root of build folders
     string buildPath;
-    // Where intermediate files go.
+    /// Where intermediate files go
     string intermediatePath;
-    // The name of the linked aggregate file.
+    /// The name of the linked aggregate file
     string aggregateFile;
-
+    /// The name of the linked optimized aggregate file
+    string aggregateOptFile;
+    /// The root folder of the current project
     string projectRoot;
+    /// The file finder to use when finding source files
     FileFinder fileFinder;
+    /// Whether or not to emit IR instead of bitcode
     bool emitIR;
-    OptimizationLevel linkOptimizationLevel;
+    /// Optimization level for final aggregated module
+    OptimizationLevel finalOptimizationLevel;
+    /// Optimization level for each individual compiled module
     OptimizationLevel compileOptimizationLevel;
 
     this()
@@ -47,6 +54,8 @@ class Project : ArgHandler
             arg( "intermediatePath|o", &intermediatePath, "Set intermediate artifact directory" ),
             arg( "filefinder", ( string opt, string val ) { fileFinder = FileFinder[ val ]; }, "Specifiy a file finder to use." ),
             arg( "emit-ir|r", &emitIR, "Emit LLVM IR instead of bitcode" ),
+            arg( "opt", &finalOptimizationLevel, "LLVM level to optimize to after aggrecation" ),
+            arg( "c-opt", &compileOptimizationLevel, "LLVM level to optimize to during compilation" ),
             arg( "verbose|v", { stdlog.logLevel = LogLevel.all; }, "Output more runtime information" )
         );
     }
@@ -66,6 +75,10 @@ class Project : ArgHandler
         buildPath = ".llbuild";
         intermediatePath = "int";
         aggregateFile = "app";
+        aggregateOptFile = "app-opt";
+
+        finalOptimizationLevel = OptimizationLevel.O3;
+        compileOptimizationLevel = OptimizationLevel.O0;
 
         projectRoot = getcwd();
         fileFinder = FileFinder[ "filetree" ];
@@ -77,6 +90,7 @@ class Project : ArgHandler
         import sdl = sdlang;
         import std.algorithm: map;
         import std.array: array;
+        import std.conv: to;
         import std.file: exists;
         import std.path: buildNormalizedPath;
 
@@ -133,8 +147,15 @@ class Project : ArgHandler
                 break;
 
             case "verbosity":
-                import std.conv: to;
                 stdlog.logLevel = tag.values[ 0 ].get!string.to!LogLevel;
+                break;
+
+            case "opt":
+                finalOptimizationLevel = tag.values[ 0 ].get!string.to!OptimizationLevel;
+                break;
+
+            case "c-opt":
+                compileOptimizationLevel = tag.values[ 0 ].get!string.to!OptimizationLevel;
                 break;
 
             default:
@@ -175,6 +196,7 @@ class Project : ArgHandler
         buildPath = projectRoot.buildNormalizedPath( buildPath );
         intermediatePath = buildPath.buildNormalizedPath( intermediatePath );
         aggregateFile = buildPath.buildNormalizedPath( aggregateFile ).setExtension( intermediateExt );
+        aggregateOptFile = buildPath.buildNormalizedPath( aggregateOptFile ).setExtension( intermediateExt );
 
         trace( "Settings: \nsourcePaths: ", sourcePaths, "\nimportPaths: ", importPaths, "\nint: ", intermediatePath, "\nff: ", fileFinder.name );
 
