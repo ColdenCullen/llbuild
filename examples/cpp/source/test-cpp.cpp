@@ -8,7 +8,7 @@ int main()
     noop();
     fakeNoop();
 
-    printf( "Dayum!\n" );
+    printf( "pass\n" );
 
     return 0;
 }
