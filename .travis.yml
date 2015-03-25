@@ -9,4 +9,4 @@ install:
 
 script:
 - ldc2 testrunner.d -of=testrunner
-- ./testrunner
+- ./testrunner -L${HOME}/ldc/lib

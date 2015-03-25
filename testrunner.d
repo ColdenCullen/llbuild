@@ -6,7 +6,7 @@ import std.path;
 import std.process;
 import std.stdio;
 
-int main()
+int main( string[] args )
 {
     writeln( "Building..." );
     auto dub = execute( [ "dub", "build", "--compiler="~environment.get( "DC", "dmd" ) ] );
@@ -25,10 +25,10 @@ int main()
     {
         chdir( project );
 
-        auto result = execute( [ llbuild, "run" ] );
+        auto result = execute( [ llbuild, "run" ] ~ args );
         if( result.status != 0 )
         {
-            writeln( "Project %s build failed:\n", project.baseName, result.output );
+            writefln( "Project %s build failed:\n%s", project.baseName, result.output );
             return 1;
         }
         else

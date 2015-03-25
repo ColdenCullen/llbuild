@@ -24,6 +24,8 @@ class Project : ArgHandler
     string[] sourcePaths;
     /// Paths to look for imported/included files in
     string[] importPaths;
+    /// Paths to look for libs in
+    string[] libPaths;
     /// Root of build folders
     string buildPath;
     /// Where intermediate files go
@@ -55,6 +57,7 @@ class Project : ArgHandler
             No.autoProcess,
             arg( "sourcePath|S", ( string opt, string val ) { sourcePaths ~= val; }, "Add source paths to search for code" ),
             arg( "importPath|I", ( string opt, string val ) { importPaths ~= val; }, "Add import paths to search for code and headers" ),
+            arg( "libPath|L", ( string opt, string val ) { libPaths ~= val; }, "Add path to search for libs in" ),
             arg( "intermediatePath", &intermediatePath, "The intermediate artifact directory" ),
             arg( "outpath", &outPath, "The output path of the compiled file" ),
             arg( "outfile|o", &outFile, "The name of the final compiled file" ),
@@ -135,6 +138,9 @@ class Project : ArgHandler
                         break;
                     case "import":
                         importPaths ~= vals;
+                        break;
+                    case "lib":
+                        libPaths ~= vals;
                         break;
                     case "intermediate":
                         intermediatePath = vals[ 0 ];

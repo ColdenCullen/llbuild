@@ -34,6 +34,8 @@ private:
                                         .map!( l => "-l" ~ l )
                                         .array();
 
+        args ~= project.libPaths.map!( p => "-L" ~ p ).array();
+
         return args;
     }
 }
