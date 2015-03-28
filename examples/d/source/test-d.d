@@ -2,8 +2,7 @@ module testd;
 
 void main()
 {
-    import std.stdio;
-    writeln( "pass" );
+    func2();
 }
 
 void func2()
