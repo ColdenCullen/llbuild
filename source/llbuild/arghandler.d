@@ -55,8 +55,8 @@ public:
     const(ArgHelpTup[]) argHelp() const @property { return _argHelp; }
     static const(ArgHelpTup[]) allArgs() @property
     {
-        import std.algorithm: map, join;
-        import std.array: array;
+        import std.algorithm: map;
+        import std.array: array, join;
         return argHandlers.map!( h => h.argHelp ).join();
     }
 

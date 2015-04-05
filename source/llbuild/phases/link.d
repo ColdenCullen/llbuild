@@ -22,8 +22,8 @@ public:
 private:
     string[] createArgs()
     {
-        import std.array: array;
-        import std.algorithm: map, join;
+        import std.array: array, join;
+        import std.algorithm: map;
 
         typeof(return) args = [
             "-o", project.outFile,

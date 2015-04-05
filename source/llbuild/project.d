@@ -76,7 +76,7 @@ class Project : ArgHandler
 
     void loadDefaultSettings()
     {
-        import std.process: getcwd;
+        import std.file: getcwd;
 
         sourcePaths = [];
         importPaths = [];
