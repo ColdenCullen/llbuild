@@ -3,6 +3,8 @@ module testd;
 void main()
 {
     func2();
+    import std.stdio: writeln;
+    writeln( "pass" );
 }
 
 void func2()
