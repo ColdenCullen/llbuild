@@ -2,7 +2,6 @@ module llbuild.project;
 import llbuild.logger;
 import llbuild.phases;
 import llbuild.filefinders;
-import llbuild.compilers;
 import llbuild.arghandler;
 
 enum projectFileName = "llbuild.sdl";

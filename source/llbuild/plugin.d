@@ -1,5 +1,4 @@
 module llbuild.plugin;
-import llbuild.compilers.compiler;
 import llbuild.filefinders.filefinder;
 
 import std.array: replace;

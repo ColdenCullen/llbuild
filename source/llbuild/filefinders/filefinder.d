@@ -1,6 +1,5 @@
 module llbuild.filefinders.filefinder;
 import llbuild.plugin;
-import llbuild.compilers.compiler;
 
 /**
  * Class responsible for finding files to compile.

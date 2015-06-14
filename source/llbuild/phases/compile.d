@@ -1,7 +1,6 @@
 module llbuild.phases.compile;
 import llbuild.plugin, llbuild.project, llbuild.logger;
 import llbuild.phases.phase;
-import llbuild.compilers;
 import llbuild.languages;
 
 final class Compile : Phase, Extension!( Compile, Phase )

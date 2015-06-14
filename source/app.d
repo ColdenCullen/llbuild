@@ -1,5 +1,5 @@
 module app;
-import llbuild.compilers, llbuild.filefinders, llbuild.project;
+import llbuild.filefinders, llbuild.project;
 import llbuild.commands;
 import llbuild.logger, llbuild.arghandler;
 
