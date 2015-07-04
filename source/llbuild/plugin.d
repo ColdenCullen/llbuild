@@ -33,6 +33,7 @@ interface Extension( ThisClass, BaseClass )
     static this()
     {
         static assert( is(typeof(new ThisClass)), ThisClass.stringof ~ " must have a default constructor." );
+        static assert( is(ThisClass : BaseClass), ThisClass.stringof ~ " does not extend " ~ BaseClass.stringof ~ "." );
         BaseClass.register( new ThisClass );
     }
 }
